@@ -28,7 +28,6 @@ def extract_basic_info_from_market(m):
 
 
 
-
 def get_greeks(
     price,  # contract price in dollars (0-1)
     spot,  # BTC spot

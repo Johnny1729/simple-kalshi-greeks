@@ -11,6 +11,7 @@ import os
 import dotenv
 import asyncio
 import websockets
+import sys
 
 
 async def connect(ws_url, headers, tickers, state):
@@ -41,12 +42,20 @@ if __name__ == "__main__":
     dotenv.load_dotenv()
     api_key = os.getenv("KALSHI_API_KEY_ID")
 
-    print('Hello world')
+    volume_thresh = 10000
+    time_thresh = 3601
+
+    if len(sys.argv) >= 2:
+        volume_thresh = int(sys.argv[1])
+    if len(sys.argv) >= 3:
+        time_thresh = int(sys.argv[2])
 
     # WebSocket URL
     ws_url = "wss://external-api-ws.kalshi.com/trade-api/ws/v2" 
 
-    markets = get_active_btc_markets(10_000, 4000)
+    print('Loading markets...')
+    markets = get_active_btc_markets(volume_thresh, time_thresh)
+    print(f"Loaded {len(markets)} markets")
     state = {
         "brti_60": None,
         "brti": None,
@@ -70,6 +79,7 @@ if __name__ == "__main__":
 
     tickers = [m['ticker'] for m in markets]
 
+    print('Signing headers...')
     private_key = load_private_key_from_file('.key')
 
     method = "GET"
